@@ -1876,6 +1876,7 @@ end subroutine EMAlquimia_Coldstart
     ! We will store mobile concentrations as  mol/m3 bulk on ELM side and mol/L on alquimia side
     ! This is so changes in layer water content across time steps are properly reflected in concentrations
     molperL_to_molperm3 = 1000.0_r8*this%chem_state%porosity*this%chem_properties%saturation
+    molperL_to_molperm3 = max(molperL_to_molperm3, minval) !BAM: capping to avoid tiny denominators that might cause later divisions to blow up
 
     ! c_f_pointer just points an array to the right data, so it needs to be actually copied
     call c_f_pointer(this%chem_state%total_mobile%data, alquimia_data, (/this%chem_sizes%num_primary/))
@@ -2468,8 +2469,10 @@ end subroutine EMAlquimia_Coldstart
     this%chem_state%porosity =    porosity(j)
     this%chem_state%temperature = temperature(j) - 273.15
     this%chem_properties%volume = volume(j)
-    this%chem_properties%saturation = sat(j)*max(liq_frac(j),0.01) ! Set minimum saturation to stop concentrations from blowing up at low soil moisture
-    if(liq_frac(j)<0.5) this%chem_state%temperature = -100.0_r8
+    this%chem_properties%saturation = sat(j)*max(liq_frac(j),1.0e-6_r8) ! Set minimum saturation to stop concentrations from blowing up at low soil moisture. BAM: testing smaller floor for liq fraction to prevent infinite concentration conversions while keeping liq sat tiny in frozen soil
+    this%chem_properties%saturation = min(max(this%chem_properties%saturation, 1.0e-12_r8), 1.0_r8) !BAM: adding safety control to prevent unreasonable values
+    !if(liq_frac(j)<0.5) this%chem_state%temperature = -100.0_r8
+    if(liq_frac(j)<1.0e-3_r8) this%chem_state%temperature = -100.0_r8 !BAM: testing fix to disable chem based on liq water availability instead of forcing abrupt temp change in case the abrupt change is contributing to convergence issues
 
     call this%copy_ELM_to_Alquimia(j,water_density,&
           aqueous_pressure,&
