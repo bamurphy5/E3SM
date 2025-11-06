@@ -774,7 +774,7 @@ contains
                 ! If flooded water surface of one column is higher than the other, add faster flow since aquifer transfer (ka parameters) is slow
                ! Maybe this should be going into qflx_surf instead of qflx_lat_aqu? 
                ! Skip this if there is snow on the ground in case it messes things up?
-               if(snow_depth(c) < 0.01_r8) then
+               if(snow_depth(c) < 0.5_r8) then !BAM: changed to not shut off water forcing unless snow is >0.5m deep
                 if(h2osfc_tide(c)>0 .and. h2osfc_tide(c)>h2osfc(c)) then
                   qflx_lat_aqu(c) = qflx_lat_aqu(c) + min((h2osfc_tide(c)-h2osfc(c))*sfcflow_ratescale,h2osfc_tide(c)*0.5/dtime)
                 elseif(h2osfc(c)>0 .and. h2osfc(c) > h2osfc_tide(c)) then
