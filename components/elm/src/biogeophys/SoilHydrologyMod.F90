@@ -764,7 +764,7 @@ contains
                ka_hu = max(ka_hu, 1e-5_r8)
 
                !DMR 12/4/2015
-               if (icefrac(c,min(jwt(c)+1,nlevbed)) .ge. .90_r8) then
+               if (icefrac(c,min(jwt(c)+1,nlevbed)) .ge. .30_r8) then !BAM: changed from 0.1 to 0.3 11/6/25
                   !turn off lateral transport if any ice is present at or below,
                   qflx_lat_aqu(c) = 0._r8
                else
