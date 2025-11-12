@@ -386,10 +386,15 @@ contains
      integer  :: ii
    !   real(r8) :: h2osfc_tide
      real(r8) :: h2osfc_before
-    ! --- BAM additions for gradual snow/ice control ---
-    real(r8) :: snow_factor, ice_factor, forcing_factor
-    real(r8), parameter :: snow_full, snow_none, ice_free, ice_frozen
+     !-----------------------------------------------------------------------
+     ! BAM additions for gradual snow/ice control (11/12/25)
+     !-----------------------------------------------------------------------
+     real(r8), parameter :: snow_full  = 0.10_r8   ! [m] snow depth below which full forcing allowed
+     real(r8), parameter :: snow_none  = 0.75_r8   ! [m] snow depth above which no forcing
+     real(r8), parameter :: ice_free   = 0.10_r8   ! [-] icefrac below which full forcing
+     real(r8), parameter :: ice_frozen = 0.50_r8   ! [-] icefrac above which no forcing
 
+     real(r8) :: snow_factor, ice_factor, forcing_factor
      !-----------------------------------------------------------------------
 
      associate(                                                    &
@@ -794,17 +799,9 @@ contains
                ! ===== end deprecated block
 
                !-----------------------------------------------------------------------
-               ! Gradual snow + ice control on tidal water forcing for polygonal tundra
+               ! Gradual snow + ice control on tidal water forcing for polygonal tundra (BAM 11/12/25)
                !-----------------------------------------------------------------------
-               ! --- New parameters (probably want to move these up for consistency) ---
-               real(r8), parameter :: snow_full = 0.10_r8   ! [m] snow depth below which full tidal forcing allowed
-               real(r8), parameter :: snow_none = 0.75_r8   ! [m] snow depth above which no forcing
-               real(r8), parameter :: ice_free  = 0.10_r8   ! [-] icefrac below which full forcing
-               real(r8), parameter :: ice_frozen = 0.50_r8  ! [-] icefrac above which no forcing
-
-               ! --- New local variables ---
-               real(r8) :: snow_factor, ice_factor, forcing_factor
-
+               
                ! Snow factor ramps from 1 → 0 as snow depth increases from snow_full → snow_none
                if (snow_depth(c) <= snow_full) then
                   snow_factor = 1._r8
