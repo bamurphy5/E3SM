@@ -386,6 +386,10 @@ contains
      integer  :: ii
    !   real(r8) :: h2osfc_tide
      real(r8) :: h2osfc_before
+    ! --- BAM additions for gradual snow/ice control ---
+    real(r8) :: snow_factor, ice_factor, forcing_factor
+    real(r8), parameter :: snow_full, snow_none, ice_free, ice_frozen
+
      !-----------------------------------------------------------------------
 
      associate(                                                    &
