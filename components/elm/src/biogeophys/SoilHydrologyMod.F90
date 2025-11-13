@@ -391,10 +391,13 @@ contains
      !-----------------------------------------------------------------------
      real(r8), parameter :: snow_full  = 0.10_r8   ! [m] snow depth below which full forcing allowed
      real(r8), parameter :: snow_none  = 0.75_r8   ! [m] snow depth above which no forcing
-     real(r8), parameter :: ice_free   = 0.10_r8   ! [-] icefrac below which full forcing
-     real(r8), parameter :: ice_frozen = 0.50_r8   ! [-] icefrac above which no forcing
+     real(r8), parameter :: ice_free   = 0.30_r8   ! [-] icefrac below which full forcing
+     real(r8), parameter :: ice_frozen = 0.70_r8   ! [-] icefrac above which no forcing
+     integer, parameter :: n_shallow_layers = 5    ! use top 5 soil layers for shallow ice average
 
-     real(r8) :: snow_factor, ice_factor, forcing_factor
+     real(r8) :: snow_factor, ice_factor, forcing_factor, ice_shallow_avg
+     integer  :: ilev, ilev_max, cnt_ice
+     real(r8) :: zwt_factor, min_trickle, desired_exchange_pos, desired_exchange_neg
      !-----------------------------------------------------------------------
 
      associate(                                                    &
