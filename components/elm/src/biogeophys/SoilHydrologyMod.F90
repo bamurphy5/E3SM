@@ -801,6 +801,9 @@ contains
                !-----------------------------------------------------------------------
                ! Gradual snow + ice control on tidal water forcing for polygonal tundra (BAM 11/12/25)
                !-----------------------------------------------------------------------
+
+               ! safety precaution: ensure qflx_lat_aqu is reset to 0 before calculating just in case
+               qflx_lat_aqu(c) = 0._r8
                
                ! Snow factor ramps from 1 → 0 as snow depth increases from snow_full → snow_none
                if (snow_depth(c) <= snow_full) then
@@ -823,20 +826,27 @@ contains
                ! Combined forcing factor (0 = off, 1 = full forcing)
                forcing_factor = max(0._r8, min(1._r8, snow_factor * ice_factor))
 
+               !compute base lateral flux before applying the forcing_factor adjustments
+               qflx_lat_aqu(c) = 2._r8 * ka_hu * (h2osfc_tide(c)/1000._r8 - (h2osfc(c)/1000._r8 - zwt(c))) / max(dist_from_stream(c), 1.0_r8)
+
+               ! Apply forcing factor to calculated base lateral subsurface flux
+               ! this scales both inflow and outflow (meaning can be +-)
+               qflx_lat_aqu(c) = forcing_factor * qflx_lat_aqu(c)
+
                ! --- Apply gradual control to lateral water flux ---
                if (forcing_factor > 0._r8) then
                   if (h2osfc_tide(c) > 0._r8 .and. h2osfc_tide(c) > h2osfc(c)) then
-                     qflx_lat_aqu(c) = forcing_factor * &
+                     qflx_lat_aqu(c) = qflx_lat_aqu(c) + forcing_factor * &
                         min((h2osfc_tide(c) - h2osfc(c)) * sfcflow_ratescale, h2osfc_tide(c) * 0.5_r8 / dtime)
                   else if (h2osfc(c) > 0._r8 .and. h2osfc(c) > h2osfc_tide(c)) then
-                     qflx_lat_aqu(c) = -forcing_factor * &
+                     qflx_lat_aqu(c) = qflx_lat_aqu(c)-forcing_factor * &
                         min((h2osfc(c) - h2osfc_tide(c)) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
                   else
                      qflx_lat_aqu(c) = 0._r8
                   endif
                else
                   ! Frozen or deep snow -> drain slowly (prevent pond buildup)
-                  qflx_lat_aqu(c) = -min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
+                  qflx_lat_aqu(c) = qflx_lat_aqu(c)-min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
                endif
 
 #endif
