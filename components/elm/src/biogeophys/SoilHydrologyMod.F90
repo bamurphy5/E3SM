@@ -390,9 +390,9 @@ contains
      ! BAM additions for gradual snow/ice control (11/12/25)
      !-----------------------------------------------------------------------
      real(r8), parameter :: snow_full  = 0.10_r8   ! [m] snow depth below which full forcing allowed
-     real(r8), parameter :: snow_none  = 0.75_r8   ! [m] snow depth above which no forcing
+     real(r8), parameter :: snow_none  = 0.50_r8   ! [m] snow depth above which no forcing
      real(r8), parameter :: ice_free   = 0.30_r8   ! [-] icefrac below which full forcing
-     real(r8), parameter :: ice_frozen = 0.70_r8   ! [-] icefrac above which no forcing
+     real(r8), parameter :: ice_frozen = 0.65_r8   ! [-] icefrac above which no forcing
 
      real(r8) :: snow_factor, ice_factor, forcing_factor
      !-----------------------------------------------------------------------
@@ -815,12 +815,12 @@ contains
                endif
 
                ! Ice factor ramps from 1 → 0 as ice fraction increases from ice_free → ice_frozen
-               if (icefrac(c,min(jwt(c)+1,nlevbed)) <= ice_free) then
+               if (icefrac(c,2)) <= ice_free) then !testing just looking at 2nd soil layer for the ice check
                   ice_factor = 1._r8
-               else if (icefrac(c,min(jwt(c)+1,nlevbed)) >= ice_frozen) then
+               else if (icefrac(c,2) >= ice_frozen) then
                   ice_factor = 0._r8
                else
-                  ice_factor = 1._r8 - (icefrac(c,min(jwt(c)+1,nlevbed)) - ice_free) / (ice_frozen - ice_free)
+                  ice_factor = 1._r8 - (icefrac(c,2) - ice_free) / (ice_frozen - ice_free)
                endif
 
                ! Combined forcing factor (0 = off, 1 = full forcing)
