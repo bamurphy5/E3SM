@@ -845,8 +845,7 @@ contains
                      qflx_lat_aqu(c) = 0._r8
                   endif
                else
-                  ! Frozen or deep snow -> drain slowly (prevent pond buildup)
-                  qflx_lat_aqu(c) = qflx_lat_aqu(c)-min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
+                  qflx_lat_aqu(c) = 0._r8
                endif
 
 #endif
