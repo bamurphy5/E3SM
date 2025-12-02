@@ -2726,7 +2726,8 @@ subroutine run_vert_transport(this,actual_dt, total_mobile, free_mobile, &
           gas_pressure = total_mobile(j,k)/porosity(j)/(this%Henry_const(k)*exp(-this%Henry_Tdep(k)*(1/temperature(j)-1/298.15)))
         endif
         ! Approximate ebullition by increasing diffusion coefficient when gas pressure is higher than water pressure
-        if(gas_pressure>water_pressure .and. sat(j)>0.75) then
+        ! BAM 12/2/25: editing so ebullition only approximated when pores contain mostly liq. water (frozen ground control), adding liq_frac(j) gating to help w/CH4 release in winter
+        if(gas_pressure>water_pressure .and. sat(j)>0.75) .and. liq_frac(j)>0.7_r8 then
           diffus(j) = max(diffus(j),2.0e-5_r8*0.66_r8*porosity(j)*((gas_pressure-water_pressure)/gas_pressure)*((gas_pressure-water_pressure)/gas_pressure)**3)
         endif
         atmo_pressure = 101.325e3_r8 ! Pa
