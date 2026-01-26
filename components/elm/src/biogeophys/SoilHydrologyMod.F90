@@ -842,10 +842,15 @@ contains
                      qflx_lat_aqu(c) = qflx_lat_aqu(c)-forcing_factor * &
                         min((h2osfc(c) - h2osfc_tide(c)) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
                   else
-                     qflx_lat_aqu(c) = 0._r8
+                     !qflx_lat_aqu(c) = 0._r8
+                     qflx_lat_aqu(c) = qflx_lat_aqu(c)-0.5*(min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime))
                   endif
                else
-                  qflx_lat_aqu(c) = 0._r8
+                  !qflx_lat_aqu(c) = 0._r8
+                  ! Frozen or deep snow OR no tidal forcing connection (dry polygons) -> drain slowly (prevent pond buildup)
+                  ! BAM: bringing back the previous drainage term but scaling it so its more muted (implemented this above too for conditions where forcing_factor >0 but the other conditions aren't met
+                  ! basically just multiply by 0.5 so 1/2 as large
+                  qflx_lat_aqu(c) = qflx_lat_aqu(c)-0.5*(min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime))
                endif
 
 #endif
