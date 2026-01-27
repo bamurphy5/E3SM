@@ -831,7 +831,7 @@ contains
 
                ! Apply forcing factor to calculated base lateral subsurface flux
                ! this scales both inflow and outflow (meaning can be +-)
-               qflx_lat_aqu(c) = forcing_factor * qflx_lat_aqu(c)
+               !qflx_lat_aqu(c) = forcing_factor * qflx_lat_aqu(c) !if forcing_factor is small but non-0 having this here dramtically weakens base flux before applying the below surface-based correction terms
 
                ! --- Apply gradual control to lateral water flux ---
                if (forcing_factor > 0._r8) then
@@ -841,9 +841,6 @@ contains
                   else if (h2osfc(c) > 0._r8 .and. h2osfc(c) > h2osfc_tide(c)) then
                      qflx_lat_aqu(c) = qflx_lat_aqu(c)-forcing_factor * &
                         min((h2osfc(c) - h2osfc_tide(c)) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime)
-                  else
-                     !qflx_lat_aqu(c) = 0._r8
-                     qflx_lat_aqu(c) = qflx_lat_aqu(c)-0.5*(min(h2osfc(c) * sfcflow_ratescale, h2osfc(c) * 0.5_r8 / dtime))
                   endif
                else
                   !qflx_lat_aqu(c) = 0._r8
